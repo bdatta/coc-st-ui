@@ -1,0 +1,77 @@
+# Pipeline configuration for one COC.
+#
+# Safe to commit next to the document: it describes how the document should be
+# processed, not how to connect to anything. Credentials — MONGODB_URI,
+# VOYAGE_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY — are read from .env only,
+# and the loader rejects the file outright if any of them appear here.
+#
+#   python tools/run_pipeline.py coc.pdf --config pipeline.yaml --embed
+#
+# Precedence, lowest first: defaults, environment/.env, this file, CLI flags.
+# Grouping headings below are cosmetic; the loader flattens one level.
+
+source:
+  outdir: build
+  doc_id: acme_ppo_2026
+  # Skip cover and contents. On a bound compilation, set this explicitly:
+  # auto-detection finds the largest consistently numbered block, not the start.
+  first_page: 3
+  # last_page: 185
+  # toc: toc.txt          # enables the ToC coverage check in validation
+
+conversion:
+  # Off for documents with a clean font-size hierarchy. Left on, bold
+  # cross-references get promoted ("Section 1: Covered Health Care Services
+  # for details.") and the heading tree is wrong from there down.
+  treat_bold_as_heading: false
+  treat_allcaps_as_heading: false
+  heading_size_ratio: 1.08
+  table_strategy: auto        # auto | lines | lines_strict | hybrid | text
+  table_format: pipe          # pipe | html
+  stitch_tables: true
+  detect_form_codes: true     # inert unless the footers carry form codes
+  force_heading_patterns:
+    - '^SECTION\s+\d+'
+    - '^ARTICLE\s+[IVX\d]+'
+
+chunking:
+  target_tokens: 650
+  max_tokens: 900
+  overlap_tokens: 90
+  max_table_tokens: 1100
+  include_row_sentences: true
+  prefix_breadcrumb: true
+
+plan:
+  plan_id: ACME-PPO-2000
+  group_number: '0084512'
+  plan_year: 2026
+  effective_date: '2026-01-01'
+  carrier: Acme Health
+  market_segment: large_group
+  states: [IL, IN]
+
+embedding:
+  embed_provider: voyage      # voyage | openai | local
+  embed_model: voyage-3.5
+  embed_dim: 1024             # must equal numDimensions on the vector index
+  embed_batch_sleep: 0.0
+
+storage:
+  mongodb_db: coc_rag
+  mongodb_collection: coc_chunks
+  vector_index: coc_vector_index
+  text_index: coc_text_index
+  create_text_index: false    # costs one of three free-tier search indexes
+  store_document_record: true
+  replace_existing: true
+  # Atlas free clusters cap at ~100 operations/second.
+  write_batch_size: 100
+  write_throttle: 0.4
+
+gates:
+  # The pipeline refuses to embed below this score. Embedding a document that
+  # failed validation costs money and builds an index nobody should trust.
+  min_validation_score: 90.0
+  allow_review: false
+  require_full_toc_coverage: true

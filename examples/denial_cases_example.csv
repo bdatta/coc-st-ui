@@ -1,0 +1,10 @@
+code,descriptor,diagnosis_code,diagnosis_descriptor,synonyms,expected
+S4025,"Donor services for in vitro fertilization (sperm or embryo), case rate",Z31.9,"Encounter for procreative management, unspecified",gestational carrier|surrogate,supported
+E0240,"Bath or shower chair, with or without wheels",,,bath chair|bath seat,supported
+15830,"Excision, excess skin and subcutaneous tissue, abdomen",,,abdominoplasty|hanging skin,supported
+42145,Palatopharyngoplasty,,,snoring|sleep apnea,supported
+64650,"Chemodenervation of eccrine glands, both axillae",,,hyperhidrosis|excessive sweating,supported
+E1300,"Whirlpool, portable (hot tub)",,,,supported
+S8940,"Equestrian / hippotherapy, per session",,,,weak
+27447,"Arthroplasty, knee, condyle and plateau",,,,not_found
+97810,"Acupuncture, one or more needles",,,acupuncture,not_found

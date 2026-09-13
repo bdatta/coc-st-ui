@@ -1,0 +1,10 @@
+code,system,descriptor,synonyms
+15830,cpt,"Excision, excess skin and subcutaneous tissue, abdomen (abdominoplasty)",abdominoplasty|panniculectomy|hanging skin
+64650,cpt,"Chemodenervation of eccrine glands, both axillae",hyperhidrosis|excessive sweating
+42145,cpt,"Palatopharyngoplasty (uvulopalatopharyngoplasty)",snoring|sleep apnea|UPPP
+43775,cpt,"Laparoscopy, surgical, gastric restrictive procedure (sleeve gastrectomy)",bariatric|obesity surgery|weight loss surgery
+27447,cpt,"Arthroplasty, knee, condyle and plateau; medial AND lateral compartments",total knee replacement
+97810,cpt,"Acupuncture, one or more needles; without electrical stimulation",acupuncture
+D8080,hcpcs,"Comprehensive orthodontic treatment, adolescent dentition",orthodontics|braces
+58970,cpt,"Follicle puncture for oocyte retrieval, any method",in vitro fertilization|IVF|infertility
+E66.01,icd10,"Morbid (severe) obesity due to excess calories",obesity

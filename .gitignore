@@ -1,0 +1,64 @@
+# ---------------------------------------------------------------------------
+# Place this at the ROOT of the COC-Parser repository, named exactly ".gitignore"
+# ---------------------------------------------------------------------------
+
+# Credentials — never commit. Applies at any depth, so coc_rag/.env is covered.
+.env
+**/.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Plan documents. Not secret, but large, and they carry group numbers and
+# employer identity. Keep them in document storage.
+*.pdf
+*.PDF
+*.zip
+*.md
+*.json
+*.jsonl
+
+
+# Generated artifacts — derived from the PDFs, rebuildable by the pipeline
+build/
+out/
+output/
+input/
+*.chunks.jsonl
+*.tables.json
+*.validation.json
+*_toc.txt
+data/
+example/
+*.md
+*.txt
+
+# Converted Markdown is derived output. Remove this line if you want a
+# reference conversion versioned alongside the code.
+*_converted.md
+
+# Per-document configuration may contain a group number; commit deliberately
+pipeline.yaml
+!pipeline.example.yaml
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
