@@ -164,7 +164,17 @@ def ensure_vector_index(
 
 
 def ensure_text_index(coll: Collection, name: str = DEFAULT_TEXT_INDEX) -> str:
-    """Lexical index for hybrid retrieval. Optional -- costs one search index."""
+    """Lexical index for hybrid retrieval. Optional -- costs one search index.
+
+    Earns its place on exact tokens that carry no semantic content: procedure
+    codes, plan-defined terms, column labels. An embedding has no useful
+    representation of "99213", where an inverted index matches it exactly.
+
+    Atlas builds this over documents already stored, so it can be added to a
+    populated collection without re-embedding anything. Fields cannot be added
+    to an existing index afterwards, though -- that needs a rebuild -- so the
+    mapping below covers everything worth searching lexically up front.
+    """
     if index_state(coll, name):
         return "exists"
     try:
@@ -176,8 +186,12 @@ def ensure_text_index(coll: Collection, name: str = DEFAULT_TEXT_INDEX) -> str:
             "dynamic": False,
             "fields": {
                 "embed_text": {"type": "string"},
+                "text": {"type": "string"},
                 "breadcrumb": {"type": "string"},
+                "column_labels": {"type": "string"},
                 "doc_id": {"type": "token"},
+                "plan_id": {"type": "token"},
+                "form_code": {"type": "token"},
             },
         }
     }

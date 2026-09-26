@@ -1,9 +1,15 @@
 """Report Atlas search index readiness and filter coverage.
 
     python tools/index_status.py
+    python tools/index_status.py --json
+    python tools/index_status.py --create-text-index --wait
+
+Creating the lexical index needs no reprocessing: Atlas builds it over the
+documents already stored, so nothing is re-chunked or re-embedded.
 """
 from __future__ import annotations
 
+import argparse
 import json
 import pathlib
 import sys
@@ -19,10 +25,35 @@ from coc.vectorstore import (  # noqa: E402
 
 
 def main() -> None:
+    ap = argparse.ArgumentParser(description="Atlas search index status.")
+    ap.add_argument("--json", action="store_true",
+                    help="also dump the raw index definitions")
+    ap.add_argument("--create-text-index", action="store_true",
+                    help="create the lexical index for hybrid search over the "
+                         "documents already stored (nothing is re-embedded)")
+    ap.add_argument("--wait", action="store_true",
+                    help="with --create-text-index, wait until it is queryable")
+    args = ap.parse_args()
+
     s = load_settings()
     coll = get_collection(s.mongodb_uri, s.mongodb_db, s.mongodb_collection)
     print(f"collection : {s.mongodb_db}.{s.mongodb_collection}")
     print(f"documents  : {coll.estimated_document_count():,}\n")
+
+    if args.create_text_index:
+        from coc.vectorstore import ensure_text_index, wait_until_queryable
+
+        state = ensure_text_index(coll, s.text_index)
+        print(f"lexical index '{s.text_index}': {state}\n")
+        if state == "exists":
+            print("   Already present. Nothing to do.\n")
+        else:
+            print("   Building over the documents already stored. Atlas usually")
+            print("   needs a minute or two before it answers queries.\n")
+            if args.wait:
+                ready = wait_until_queryable(coll, s.text_index, timeout=600,
+                                             progress=lambda m: print(f"   {m}"))
+                print(f"   {'queryable' if ready else 'still building'}\n")
 
     indexes = list_search_indexes(coll)
     if not indexes:
@@ -63,7 +94,7 @@ def main() -> None:
             print("    still building — queries return empty until this says READY")
         print()
 
-    if "--json" in sys.argv:
+    if args.json:
         print(json.dumps(indexes, indent=2, default=str))
 
 
