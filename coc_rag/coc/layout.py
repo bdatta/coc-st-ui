@@ -241,7 +241,18 @@ def heading_level(
     if not text or len(text) > max_len:
         return None
     if BULLET_RE.match(text) and not KEYWORD_RE.match(text):
-        return None
+        # An enumerator does not make a line a bullet. Legal documents number
+        # their sub-headings -- "I. Personal Care, Comfort or Convenience",
+        # "A. Dental" -- and rejecting those left every exclusion beneath them
+        # parented to the section above, so a bath-chair citation named the
+        # wrong sub-section. Reject only at body size, where a numbered line
+        # really is a list item ("1. Television.").
+        enumerated_heading = (
+            size_levels.get(line.size) is not None
+            or (line.bold and line.size > body_size)
+        )
+        if not enumerated_heading:
+            return None
 
     for pat in force_patterns:
         if pat.search(text):
